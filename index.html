@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novachat | Next-Gen AI Chat</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Appwrite SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
+</head>
+
+
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-top-actions">
+                    <div class="logo">
+                        <i data-lucide="zap" class="logo-icon"></i>
+                        <span>Novachat</span>
+                    </div>
+                    <button id="sidebar-toggle" class="sidebar-toggle-btn" title="Toggle Sidebar">
+                        <i data-lucide="panel-left"></i>
+                    </button>
+                </div>
+
+                <nav class="sidebar-menu">
+                    <button class="menu-item new-chat-btn">
+                        <i data-lucide="plus-circle"></i>
+                        <span>New Chat</span>
+                    </button>
+                    <button class="menu-item">
+                        <i data-lucide="image"></i>
+                        <span>Images</span>
+                    </button>
+                    <button class="menu-item">
+                        <i data-lucide="layout-grid"></i>
+                        <span>Apps</span>
+                    </button>
+                    <button class="menu-item">
+                        <i data-lucide="code"></i>
+                        <span>Codex</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="history-section">
+                <div class="section-divider"></div>
+                <h3 class="section-title">Your Chats</h3>
+                <div class="chat-history">
+                    <!-- Dynamic chat items -->
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">U</div>
+                    <span class="username">Guest User</span>
+                    <button class="settings-btn" title="Settings">
+                        <i data-lucide="settings"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <header class="chat-header">
+                <div class="chat-info">
+                    <button id="header-sidebar-toggle" class="sidebar-toggle-btn header-toggle" title="Show Sidebar"
+                        style="display: none; margin-right: 1rem;">
+                        <i data-lucide="panel-left"></i>
+                    </button>
+                    <h2>Novachat v1.0</h2>
+                    <span class="status pulse">Ready to echo</span>
+                </div>
+                <div class="chat-actions">
+                    <button id="pause-btn" class="action-btn pause" disabled title="Pause Generation">
+                        <i data-lucide="pause"></i>
+                        <span>Pause</span>
+                    </button>
+                    <button id="resume-btn" class="action-btn resume hidden" title="Resume Generation">
+                        <i data-lucide="play"></i>
+                        <span>Resume</span>
+                    </button>
+                    <button id="stop-btn" class="action-btn stop" disabled title="Stop Generation">
+                        <i data-lucide="square"></i>
+                        <span>Stop</span>
+                    </button>
+                    <button id="export-pdf" class="action-btn" title="Export as PDF">
+                        <i data-lucide="file-down"></i>
+                        <span>Export</span>
+                    </button>
+                    <button class="action-btn" title="Sharing">
+                        <i data-lucide="share-2"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div id="chat-messages" class="messages-container">
+                <!-- Messages will be injected here -->
+                <div class="message system">
+                    <div class="message-content">
+                        <p>Welcome to <strong>Novachat</strong>. I am your high-performance echo assistant. Whatever you
+                            say, I will reflect back with precision.</p>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="input-area">
+                <div class="input-wrapper-container">
+                    <div id="file-preview-area" class="file-preview-area hidden"></div>
+                    <div class="input-wrapper">
+                        <label for="file-upload" class="upload-btn" title="Upload File">
+                            <i data-lucide="paperclip"></i>
+                            <input type="file" id="file-upload" hidden multiple>
+                        </label>
+                        <button id="voice-btn" class="upload-btn" title="Record Voice">
+                            <i data-lucide="mic"></i>
+                        </button>
+                        <textarea id="chat-input" placeholder="Message Novachat..." rows="1"></textarea>
+                        <button id="send-btn" class="send-btn" disabled>
+                            <i data-lucide="arrow-up"></i>
+                        </button>
+                    </div>
+                </div>
+                <p class="disclaimer">Novachat can make mistakes. Verify important info.</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="settings-modal">
+            <h2>Settings</h2>
+            <div class="settings-row">
+                <span>Display Name</span>
+                <input type="text" id="username-input" class="settings-input" placeholder="Enter your name...">
+            </div>
+            <div class="settings-row">
+                <span>Theme</span>
+                <div class="theme-switch">
+                    <button id="dark-theme-btn" class="theme-btn active">
+                        <i data-lucide="moon"></i>
+                        Dark
+                    </button>
+                    <button id="light-theme-btn" class="theme-btn">
+                        <i data-lucide="sun"></i>
+                        Light
+                    </button>
+                </div>
+            </div>
+            <button id="close-settings" class="close-modal-btn">Done</button>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+
+    <script src="script.js"></script>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
