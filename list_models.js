@@ -1,4 +1,5 @@
-const GEMINI_API_KEY = 'AIzaSyBMZJT5zrJfG9jUm4sc74NsJipgOEkPrAw';
+const GEMINI_API_KEY = 'AIzaSyD5k3lnU6lGQv2OHWBE8Zljez5ZNu3he0o';
+// DO NOT LEAK YOUR KEY. Use .env instead.
 const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${GEMINI_API_KEY}`;
 
 async function listModels() {
