@@ -2,12 +2,20 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-// --- Dynamic Environment Loader ---
-const envPath = path.join(__dirname, '.env');
-
+// --- Get API Key ---
 function getLatestKey() {
+
+    // Railway / hosting environment variable
+    if (process.env.GEMINI_API_KEY) {
+        return process.env.GEMINI_API_KEY;
+    }
+
+    // Local .env file (for local testing)
+    const envPath = path.join(__dirname, '.env');
+
     try {
         if (fs.existsSync(envPath)) {
+
             const envFile = fs.readFileSync(envPath, 'utf8');
             const lines = envFile.split('\n');
 
@@ -15,7 +23,7 @@ function getLatestKey() {
                 const [key, value] = line.split('=');
 
                 if (key && value) {
-                    if (key.trim() === 'GEMINI_API_KEY' && value.trim() !== 'YOUR_NEW_KEY_HERE') {
+                    if (key.trim() === 'GEMINI_API_KEY') {
                         return value.trim();
                     }
                 }
@@ -28,6 +36,7 @@ function getLatestKey() {
     return null;
 }
 
+// Railway dynamic port
 const PORT = process.env.PORT || 3000;
 
 const MIME_TYPES = {
@@ -54,23 +63,24 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    // --- AI API ROUTE ---
     const urlPath = req.url.split('?')[0];
 
+    // --- AI CHAT API ---
     if (urlPath.includes('/api/chat')) {
 
         console.log(`[${new Date().toLocaleTimeString()}] 🤖 AI Request Received`);
 
         const apiKey = getLatestKey();
 
-        if (!apiKey || apiKey === 'YOUR_NEW_KEY_HERE') {
+        if (!apiKey) {
+
             console.error("❌ GEMINI_API_KEY Missing");
 
             res.writeHead(401, { 'Content-Type': 'application/json' });
 
             res.end(JSON.stringify({
                 error: {
-                    message: "API Key not found. Please add GEMINI_API_KEY in .env file."
+                    message: "Missing API key. Add GEMINI_API_KEY in Railway Variables."
                 }
             }));
 
@@ -163,6 +173,7 @@ const server = http.createServer(async (req, res) => {
 
 });
 
+// IMPORTANT for Railway
 server.listen(PORT, '0.0.0.0', () => {
 
     console.log(`\n🚀 Novachat AI Server is LIVE!`);
